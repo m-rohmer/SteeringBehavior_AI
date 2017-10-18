@@ -1,0 +1,2 @@
+﻿Vector2d.obj : warning LNK4075: ' /EDITANDCONTINUE' ignoré à cause de la spécification '/SAFESEH'
+  Steering.vcxproj -> C:\Users\martin\Buckland_Chapter3-Steering Behaviors\.\Debug\Steering.exe
