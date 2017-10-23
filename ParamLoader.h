@@ -39,6 +39,8 @@ private:
     VehicleMass             = GetNextParameterFloat();
     VehicleScale            = GetNextParameterFloat();
 
+	LeaderScale				= GetNextParameterFloat();
+
     SeparationWeight        = GetNextParameterFloat() * SteeringForceTweaker;
     AlignmentWeight         = GetNextParameterFloat() * SteeringForceTweaker;
     CohesionWeight          = GetNextParameterFloat() * SteeringForceTweaker;
@@ -102,6 +104,8 @@ public:
 
   double VehicleScale;
   double MaxTurnRatePerSecond;
+
+  double LeaderScale;
 
   double SeparationWeight;
   double AlignmentWeight ;

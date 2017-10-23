@@ -66,7 +66,7 @@ private:
 
 public:
 
-  Vehicle(GameWorld* world,
+  explicit Vehicle(GameWorld* world,
          Vector2D position,
          double    rotation,
          Vector2D velocity,

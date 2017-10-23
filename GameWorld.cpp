@@ -1,5 +1,6 @@
 #include "GameWorld.h"
 #include "Vehicle.h"
+#include "Leader.h"
 #include "constants.h"
 #include "Obstacle.h"
 #include "2d/Geometry.h"
@@ -48,15 +49,34 @@ GameWorld::GameWorld(int cx, int cy):
   double border = 30;
   m_pPath = new Path(5, border, border, cx-border, cy-border, true); 
 
-  //setup the agents
-  for (int a=0; a<Prm.NumAgents; ++a)
-  {
-
-    //determine a random starting position
+	//determine a random starting position
     Vector2D SpawnPos = Vector2D(cx/2.0+RandomClamped()*cx/2.0,
                                  cy/2.0+RandomClamped()*cy/2.0);
 
+	// Leader
+	Leader* pLeader = new Leader(this,
+							SpawnPos,                 //initial position
+							RandFloat()*TwoPi,        //start rotation
+							Vector2D(0,0),            //velocity
+							Prm.VehicleMass,          //mass
+							Prm.MaxSteeringForce,     //max force
+							Prm.MaxSpeed*0.66,             //max velocity
+							Prm.MaxTurnRatePerSecond, //max turn rate
+							Prm.LeaderScale);        //scale
+		
+	pLeader->Steering()->WanderOn();
+	m_Vehicles.push_back(pLeader);
+	//add it to the cell subdivision
+	m_pCellSpace->AddEntity(pLeader);
+	
 
+  //setup the agents
+  for (int a=1; a<Prm.NumAgents; ++a)
+  {
+	  
+	//determine a random starting position
+    Vector2D SpawnPos = Vector2D(cx/2.0+RandomClamped()*cx/2.0,
+                                 cy/2.0+RandomClamped()*cy/2.0);
     Vehicle* pVehicle = new Vehicle(this,
                                     SpawnPos,                 //initial position
                                     RandFloat()*TwoPi,        //start rotation
@@ -67,27 +87,24 @@ GameWorld::GameWorld(int cx, int cy):
                                     Prm.MaxTurnRatePerSecond, //max turn rate
                                     Prm.VehicleScale);        //scale
 
-    pVehicle->Steering()->FlockingOn();
+	    //pVehicle->Steering()->FlockingOn();
+		m_Vehicles.push_back(pVehicle);
+		//add it to the cell subdivision
+		m_pCellSpace->AddEntity(pVehicle);
 
-    m_Vehicles.push_back(pVehicle);
-
-    //add it to the cell subdivision
-    m_pCellSpace->AddEntity(pVehicle);
   }
 
 
 #define SHOAL
 #ifdef SHOAL
-  m_Vehicles[Prm.NumAgents-1]->Steering()->FlockingOff();
-  m_Vehicles[Prm.NumAgents-1]->SetScale(Vector2D(10, 10));
-  m_Vehicles[Prm.NumAgents-1]->Steering()->WanderOn();
-  m_Vehicles[Prm.NumAgents-1]->SetMaxSpeed(70);
 
-
-   for (int i=0; i<Prm.NumAgents-1; ++i)
+  // Poursuite du leader par les autres véhicules
+  // offset de la poursuite : 
+  int offsetDistance = 30;
+   for (int i=1; i<Prm.NumAgents; ++i)
   {
-    m_Vehicles[i]->Steering()->EvadeOn(m_Vehicles[Prm.NumAgents-1]);
-
+		Vector2D offset = Vector2D(-offsetDistance,0);           // Pursuit offset 
+		m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
   }
 #endif
  
@@ -308,6 +325,51 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
           }
         }
         break;
+		
+	case 'W':
+		if (m_Vehicles[0]->Steering()->isWanderOn())
+		{
+			m_Vehicles[0]->Steering()->WanderOff();
+		} else
+		{
+			m_Vehicles[0]->Steering()->WanderOn();
+		}
+		break;
+		
+	case 'Z':
+		m_Vehicles[0]->SetMaxSpeed(1000);
+		if (m_Vehicles[0]->Velocity().Length()<m_Vehicles[0]->MaxSpeed())
+		{
+			//Incrément de vitesse : 
+			int i = 10;
+			Vector2D newSpeed = m_Vehicles[0]->Velocity();
+			double l = newSpeed.Length();
+			newSpeed.x = newSpeed.x*(l+i)/l;
+			newSpeed.y = newSpeed.y*(l+i)/l;
+			m_Vehicles[0]->SetVelocity(newSpeed);
+		}
+		break;
+		
+	case 'S':
+		if (m_Vehicles[0]->Velocity().Length()>0)
+		{
+			//Incrément de vitesse : 
+			int i = -10;
+			Vector2D newSpeed = m_Vehicles[0]->Velocity();
+			double l = newSpeed.Length();
+			newSpeed.x = max(newSpeed.x*(l+i)/l, 0);
+			newSpeed.y = max(newSpeed.y*(l+i)/l, 0);
+			m_Vehicles[0]->SetVelocity(newSpeed);
+		}
+		break;
+
+	case 'Q':
+		if (m_Vehicles[0]->Steering()->isWanderOn())
+		{
+			m_Vehicles[0]->Steering()->WanderOff();
+		}
+		m_Vehicles[0]->SetHeading(Vector2D(cos(pi/4), sin(pi/4)));
+		break;
 
   }//end switch
 }
