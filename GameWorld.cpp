@@ -65,6 +65,8 @@ GameWorld::GameWorld(int cx, int cy):
 							Prm.LeaderScale);        //scale
 		
 	pLeader->Steering()->WanderOn();
+	pLeader->Steering()->WallAvoidanceOn();
+
 	m_Vehicles.push_back(pLeader);
 	//add it to the cell subdivision
 	m_pCellSpace->AddEntity(pLeader);
@@ -105,12 +107,15 @@ GameWorld::GameWorld(int cx, int cy):
   {
 		Vector2D offset = Vector2D(-offsetDistance,0);           // Pursuit offset 
 		m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
+
+		// Eviter les murs
+		m_Vehicles[i]->Steering()->WallAvoidanceOn();
   }
 #endif
  
   //create any obstacles or walls
   //CreateObstacles();
-  //CreateWalls();
+  CreateWalls();
 }
 
 
