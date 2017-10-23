@@ -42,7 +42,8 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 
     switch (msg)
     {
-	
+
+
 		//A WM_CREATE msg is sent when your application window is first
 		//created
     case WM_CREATE:
@@ -91,9 +92,31 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
       break;
 
     case WM_COMMAND:
-    {
-      g_GameWorld->HandleMenuItems(wParam, hwnd); 
-    }
+	{
+		g_GameWorld->HandleMenuItems(wParam, hwnd);
+
+		switch (int(wParam))
+		{
+		case ID_PLUS_AGENT:
+		{
+			Prm.NumAgents++;
+			delete g_GameWorld;
+			g_GameWorld = new GameWorld(cxClient, cyClient);
+			//ChangeMenuState(hwnd, ID_OB_WALLS, MFS_CHECKED);
+		}
+
+		break;
+
+		case ID_MOINS_AGENT:
+		{
+			Prm.NumAgents--;
+			delete g_GameWorld;
+			g_GameWorld = new GameWorld(cxClient, cyClient);
+		}
+
+		break;
+		}
+	}
 
     break;
 

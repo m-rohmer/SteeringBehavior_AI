@@ -28,9 +28,7 @@ class Vehicle : public MovingEntity
 
 private:
 
-  //a pointer to the world data. So a vehicle can access any obstacle,
-  //path, wall or agent data
-  GameWorld*            m_pWorld;
+//////////world
 
   //the steering behavior class
   SteeringBehavior*     m_pSteering;
@@ -53,8 +51,9 @@ private:
   double                m_dTimeElapsed;
 
 
-  //buffer for the vehicle shape
-  std::vector<Vector2D> m_vecVehicleVB;
+
+  /////////////////BUFFER
+
 
   //fills the buffer with vertex data
   void InitializeBuffer();
@@ -98,6 +97,14 @@ public:
   
   double       TimeElapsed()const{return m_dTimeElapsed;}
  
+
+  //buffer for the vehicle shape
+  std::vector<Vector2D> m_vecVehicleVB;
+
+  //a pointer to the world data. So a vehicle can access any obstacle,
+  //path, wall or agent data
+  GameWorld*            m_pWorld;
+
 };
 
 

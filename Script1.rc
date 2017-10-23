@@ -30,7 +30,8 @@ IDR_MENU1 MENU DISCARDABLE
 BEGIN
     POPUP "Objects"
     BEGIN
-        MENUITEM "Walls On/Off",                ID_OB_WALLS
+		MENUITEM "Plus 1 agent",				ID_PLUS_AGENT
+		MENUITEM "Moins 1 agent",				ID_MOINS_AGENT
         MENUITEM "Obstacles On/Off",            ID_OB_OBSTACLES
     END
     POPUP "Space Partitioning"

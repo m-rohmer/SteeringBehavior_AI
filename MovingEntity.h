@@ -53,7 +53,7 @@ public:
                double    mass,
                Vector2D scale,
                double    turn_rate,
-               double    max_force):BaseGameEntity(0, position, radius),
+               double    max_force):BaseGameEntity(1, position, radius),
                                   m_vHeading(heading),
                                   m_vVelocity(velocity),
                                   m_dMass(mass),

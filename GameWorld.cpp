@@ -54,7 +54,7 @@ GameWorld::GameWorld(int cx, int cy):
                                  cy/2.0+RandomClamped()*cy/2.0);
 
 	// Leader
-	Leader* pLeader = new Leader(this,
+	firstLeader = new Leader(this,
 							SpawnPos,                 //initial position
 							RandFloat()*TwoPi,        //start rotation
 							Vector2D(0,0),            //velocity
@@ -64,12 +64,13 @@ GameWorld::GameWorld(int cx, int cy):
 							Prm.MaxTurnRatePerSecond, //max turn rate
 							Prm.LeaderScale);        //scale
 		
-	pLeader->Steering()->WanderOn();
-	pLeader->Steering()->WallAvoidanceOn();
+	firstLeader->Steering()->WanderOn();
+	firstLeader->Steering()->WallAvoidanceOn();
 
-	m_Vehicles.push_back(pLeader);
+
+	m_Vehicles.push_back(firstLeader);
 	//add it to the cell subdivision
-	m_pCellSpace->AddEntity(pLeader);
+	m_pCellSpace->AddEntity(firstLeader);
 	
 
   //setup the agents
@@ -79,6 +80,7 @@ GameWorld::GameWorld(int cx, int cy):
 	//determine a random starting position
     Vector2D SpawnPos = Vector2D(cx/2.0+RandomClamped()*cx/2.0,
                                  cy/2.0+RandomClamped()*cy/2.0);
+
     Vehicle* pVehicle = new Vehicle(this,
                                     SpawnPos,                 //initial position
                                     RandFloat()*TwoPi,        //start rotation
@@ -417,39 +419,6 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
        break;
 
-    case ID_OB_WALLS:
-
-      m_bShowWalls = !m_bShowWalls;
-
-      if (m_bShowWalls)
-      {
-        CreateWalls();
-
-        for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-        {
-          m_Vehicles[i]->Steering()->WallAvoidanceOn();
-        }
-
-        //check the menu
-         ChangeMenuState(hwnd, ID_OB_WALLS, MFS_CHECKED);
-      }
-
-      else
-      {
-        m_Walls.clear();
-
-        for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-        {
-          m_Vehicles[i]->Steering()->WallAvoidanceOff();
-        }
-
-        //uncheck the menu
-         ChangeMenuState(hwnd, ID_OB_WALLS, MFS_UNCHECKED);
-      }
-
-      break;
-
-
     case IDR_PARTITIONING:
       {
         for (unsigned int i=0; i<m_Vehicles.size(); ++i)
@@ -603,6 +572,7 @@ void GameWorld::Render()
   //render the agents
   for (unsigned int a=0; a<m_Vehicles.size(); ++a)
   {
+	firstLeader->RenderLeader();
     m_Vehicles[a]->Render();  
     
     //render cell partitioning stuff

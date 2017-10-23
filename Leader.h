@@ -10,13 +10,6 @@
 //  Author: Mat Buckland 2002 (fup@ai-junkie.com)
 //
 //------------------------------------------------------------------------
-#include "MovingEntity.h"
-#include "2d/Vector2D.h"
-#include "misc/Smoother.h"
-
-#include <vector>
-#include <list>
-#include <string>
 
 #include "Vehicle.h"
 
@@ -39,8 +32,13 @@ public:
 	
 	void setScale(double s){scale_ = s;}
 
+	void        RenderLeader();
+
 private:
 	double scale_;
+
+	// savoir si le leader est un ordi ou non
+	bool ordi_ = true;
 
 };
 

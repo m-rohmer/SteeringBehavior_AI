@@ -21,6 +21,7 @@
 #include "BaseGameEntity.h"
 #include "EntityFunctionTemplates.h"
 #include "vehicle.h"
+#include "Leader.h"
 
 
 class Obstacle;
@@ -39,6 +40,8 @@ private:
   
 
   std::vector<Vehicle*>         m_Vehicles;
+
+  Leader* firstLeader;
 
   //any obstacles
   std::vector<BaseGameEntity*>  m_Obstacles;
