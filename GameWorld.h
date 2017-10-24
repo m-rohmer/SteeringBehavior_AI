@@ -38,10 +38,15 @@ private:
 
   //a container of all the moving entities
   
+ 
 
   std::vector<Vehicle*>         m_Vehicles;
 
+  std::vector<Leader*>          m_Leader;
+
   Leader* firstLeader;
+
+  Leader* secondLeader;
 
   //any obstacles
   std::vector<BaseGameEntity*>  m_Obstacles;
@@ -88,7 +93,7 @@ private:
   
 
 public:
-  
+
   GameWorld(int cx, int cy);
 
   ~GameWorld();

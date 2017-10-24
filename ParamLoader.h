@@ -74,6 +74,7 @@ private:
     prArrive                = GetNextParameterFloat();
 
     MaxTurnRatePerSecond    = Pi;
+	OneLeader = true;
   }
 
 public:
@@ -82,6 +83,7 @@ public:
 
   int	NumAgents;
   int	NumObstacles;
+  bool OneLeader;
   double MinObstacleRadius;
   double MaxObstacleRadius;
 

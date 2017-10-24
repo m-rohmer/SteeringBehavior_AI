@@ -84,7 +84,7 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
          
          g_GameWorld = new GameWorld(cxClient, cyClient);
 
-         ChangeMenuState(hwnd, IDR_PRIORITIZED, MFS_CHECKED);
+         ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_CHECKED);
          ChangeMenuState(hwnd, ID_VIEW_FPS, MFS_CHECKED);
          
       }
@@ -102,19 +102,44 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 			Prm.NumAgents++;
 			delete g_GameWorld;
 			g_GameWorld = new GameWorld(cxClient, cyClient);
-			//ChangeMenuState(hwnd, ID_OB_WALLS, MFS_CHECKED);
 		}
 
 		break;
 
 		case ID_MOINS_AGENT:
 		{
-			Prm.NumAgents--;
-			delete g_GameWorld;
-			g_GameWorld = new GameWorld(cxClient, cyClient);
+			if (Prm.NumAgents > 2)
+			{
+				Prm.NumAgents--;
+				delete g_GameWorld;
+				g_GameWorld = new GameWorld(cxClient, cyClient);
+			}
 		}
 
 		break;
+
+		case IDR_ONE_LEADER:
+		{
+			Prm.OneLeader = true;
+			delete g_GameWorld;
+			g_GameWorld = new GameWorld(cxClient, cyClient);
+			ChangeMenuState(hwnd, IDR_TWO_LEADER, MFS_UNCHECKED);
+			ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_CHECKED);
+		}
+
+		break;
+
+		case IDR_TWO_LEADER:
+		{
+			Prm.OneLeader = false;
+			delete g_GameWorld;
+			g_GameWorld = new GameWorld(cxClient, cyClient);
+			ChangeMenuState(hwnd, IDR_TWO_LEADER, MFS_CHECKED);
+			ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_UNCHECKED);
+		}
+
+		break;
+
 		}
 	}
 

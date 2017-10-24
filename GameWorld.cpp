@@ -98,6 +98,27 @@ GameWorld::GameWorld(int cx, int cy):
 
   }
 
+  if (!Prm.OneLeader)
+  {
+	  // SecondLeader
+	  secondLeader = new Leader(this,
+		  SpawnPos,                 //initial position
+		  RandFloat()*TwoPi,        //start rotation
+		  Vector2D(0, 0),            //velocity
+		  Prm.VehicleMass,          //mass
+		  Prm.MaxSteeringForce,     //max force
+		  Prm.MaxSpeed*0.66,             //max velocity
+		  Prm.MaxTurnRatePerSecond, //max turn rate
+		  Prm.LeaderScale);        //scale
+
+	  secondLeader->Steering()->WanderOn();
+	  secondLeader->Steering()->WallAvoidanceOn();
+
+
+	  m_Vehicles.push_back(secondLeader);
+	  //add it to the cell subdivision
+	  m_pCellSpace->AddEntity(secondLeader);
+  }
 
 #define SHOAL
 #ifdef SHOAL
@@ -112,6 +133,10 @@ GameWorld::GameWorld(int cx, int cy):
 
 		// Eviter les murs
 		m_Vehicles[i]->Steering()->WallAvoidanceOn();
+
+		// Une ligne bien structurée
+		m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+
   }
 #endif
  
@@ -419,7 +444,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
        break;
 
-    case IDR_PARTITIONING:
+    /*case IDR_ONE_LEADER:
       {
         for (unsigned int i=0; i<m_Vehicles.size(); ++i)
         {
@@ -441,16 +466,16 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
         }
         else
         {
-          ChangeMenuState(hwnd, IDR_PARTITIONING, MFS_UNCHECKED);
-          ChangeMenuState(hwnd, IDM_PARTITION_VIEW_NEIGHBORS, MFS_UNCHECKED);
+          ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_UNCHECKED);
+          ChangeMenuState(hwnd, IDR_TWO_LEADER, MFS_UNCHECKED);
           m_bShowCellSpaceInfo = false;
 
-        }
+  
       }
 
-      break;
+      break;*/
 
-    case IDM_PARTITION_VIEW_NEIGHBORS:
+    /*case IDR_TWO_LEADER:
       {
         m_bShowCellSpaceInfo = !m_bShowCellSpaceInfo;
         
@@ -460,7 +485,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
           if (!m_Vehicles[0]->Steering()->isSpacePartitioningOn())
           {
-            SendMessage(hwnd, WM_COMMAND, IDR_PARTITIONING, NULL);
+            SendMessage(hwnd, WM_COMMAND, IDR_ONE_LEADER, NULL);
           }
         }
         else
@@ -468,7 +493,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
           ChangeMenuState(hwnd, IDM_PARTITION_VIEW_NEIGHBORS, MFS_UNCHECKED);
         }
       }
-      break;
+      break;*/
         
 
     case IDR_WEIGHTED_SUM:
