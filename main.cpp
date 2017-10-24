@@ -102,9 +102,8 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 			Prm.NumAgents++;
 			delete g_GameWorld;
 			g_GameWorld = new GameWorld(cxClient, cyClient);
+			break;
 		}
-
-		break;
 
 		case ID_MOINS_AGENT:
 		{
@@ -114,9 +113,8 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 				delete g_GameWorld;
 				g_GameWorld = new GameWorld(cxClient, cyClient);
 			}
+			break;
 		}
-
-		break;
 
 		case IDR_ONE_LEADER:
 		{
@@ -125,9 +123,8 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 			g_GameWorld = new GameWorld(cxClient, cyClient);
 			ChangeMenuState(hwnd, IDR_TWO_LEADER, MFS_UNCHECKED);
 			ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_CHECKED);
+			break;
 		}
-
-		break;
 
 		case IDR_TWO_LEADER:
 		{
@@ -136,13 +133,10 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 			g_GameWorld = new GameWorld(cxClient, cyClient);
 			ChangeMenuState(hwnd, IDR_TWO_LEADER, MFS_CHECKED);
 			ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_UNCHECKED);
+			break;
 		}
-
-		break;
-
-		}
-	}
-
+		}// end switch
+	} // end case wp_command
     break;
 
 
@@ -152,6 +146,12 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
     }
     
     break;
+
+	case WM_KEYDOWN:
+		{
+	        g_GameWorld->HandleKeyDown(wParam);
+		}
+		break;
 
     case WM_KEYUP:
       {

@@ -71,6 +71,10 @@ private:
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
 
+  // Offset distance between agents
+  
+  int							m_iOffsetDistance;
+
 
   //flags to turn aids and obstacles etc on/off
   bool  m_bShowWalls;
@@ -122,8 +126,9 @@ public:
 
 
   //handle WM_COMMAND messages
-  void        HandleKeyPresses(WPARAM wParam);
-  void        HandleMenuItems(WPARAM wParam, HWND hwnd);
+  void			HandleKeyDown(WPARAM wParam);
+  void			HandleKeyPresses(WPARAM wParam);
+  void			HandleMenuItems(WPARAM wParam, HWND hwnd);
   
   void        TogglePause(){m_bPaused = !m_bPaused;}
   bool        Paused()const{return m_bPaused;}

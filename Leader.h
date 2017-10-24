@@ -38,7 +38,6 @@ private:
 	double scale_;
 
 	// savoir si le leader est un ordi ou non
-	bool ordi_ = true;
 
 };
 

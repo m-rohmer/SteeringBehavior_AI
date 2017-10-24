@@ -38,6 +38,9 @@ const double WanderRad    = 1.2;
 const double WanderDist   = 2.0;
 //the maximum amount of displacement along the circle each frame
 const double WanderJitterPerSec = 80.0;
+//initial direction in manual mode (-1=left, 0=front, 1=right)
+enum Direction{front = 0, left = -1, right = 1};
+const Direction ManuaInitialDirection = front;
 
 //used in path following
 const double WaypointSeekDist   = 20;                                          
@@ -73,6 +76,7 @@ private:
     hide               = 0x04000,
     flock              = 0x08000,
     offset_pursuit     = 0x10000,
+	manual			   = 0x20000,
   };
 
 private:
@@ -113,6 +117,9 @@ private:
   double        m_dWanderRadius;
   double        m_dWanderDistance;
 
+  // Value depending on the direction (left/none/right) in manual mode
+  Direction		m_dManualDirection;
+
 
   //multipliers. These can be adjusted to effect strength of the  
   //appropriate behavior. Useful to get flocking the way you require
@@ -121,6 +128,7 @@ private:
   double        m_dWeightCohesion;
   double        m_dWeightAlignment;
   double        m_dWeightWander;
+  double        m_dWeightManual;
   double        m_dWeightObstacleAvoidance;
   double        m_dWeightWallAvoidance;
   double        m_dWeightSeek;
@@ -210,6 +218,9 @@ private:
   //this behavior makes the agent wander about randomly
   Vector2D Wander();
 
+  //this behavior makes the agent moving with user controls
+  Vector2D Manual();
+
   //this returns a steering force which will attempt to keep the agent 
   //away from any obstacles it may encounter
   Vector2D ObstacleAvoidance(const std::vector<BaseGameEntity*>& obstacles);
@@ -292,6 +303,8 @@ public:
 
   void      SetTarget(const Vector2D t){m_vTarget = t;}
 
+  void		SetManualDirection(Direction dir){m_dManualDirection = dir;}
+
   void      SetTargetAgent1(Vehicle* Agent){m_pTargetAgent1 = Agent;}
   void      SetTargetAgent2(Vehicle* Agent){m_pTargetAgent2 = Agent;}
 
@@ -314,6 +327,7 @@ public:
   void SeekOn(){m_iFlags |= seek;}
   void ArriveOn(){m_iFlags |= arrive;}
   void WanderOn(){m_iFlags |= wander;}
+  void ManualOn(){m_iFlags |= manual;}
   void PursuitOn(Vehicle* v){m_iFlags |= pursuit; m_pTargetAgent1 = v;}
   void EvadeOn(Vehicle* v){m_iFlags |= evade; m_pTargetAgent1 = v;}
   void CohesionOn(){m_iFlags |= cohesion;}
@@ -331,6 +345,7 @@ public:
   void SeekOff()  {if(On(seek))   m_iFlags ^=seek;}
   void ArriveOff(){if(On(arrive)) m_iFlags ^=arrive;}
   void WanderOff(){if(On(wander)) m_iFlags ^=wander;}
+  void ManualOff(){if(On(manual)) m_iFlags ^=manual;}
   void PursuitOff(){if(On(pursuit)) m_iFlags ^=pursuit;}
   void EvadeOff(){if(On(evade)) m_iFlags ^=evade;}
   void CohesionOff(){if(On(cohesion)) m_iFlags ^=cohesion;}
@@ -347,6 +362,7 @@ public:
   bool isFleeOn(){return On(flee);}
   bool isSeekOn(){return On(seek);}
   bool isArriveOn(){return On(arrive);}
+  bool isManualOn(){return On(manual);}
   bool isWanderOn(){return On(wander);}
   bool isPursuitOn(){return On(pursuit);}
   bool isEvadeOn(){return On(evade);}
@@ -366,6 +382,8 @@ public:
   double WanderJitter()const{return m_dWanderJitter;}
   double WanderDistance()const{return m_dWanderDistance;}
   double WanderRadius()const{return m_dWanderRadius;}
+
+  double ManualDirection()const{return m_dManualDirection;}
 
   double SeparationWeight()const{return m_dWeightSeparation;}
   double AlignmentWeight()const{return m_dWeightAlignment;}

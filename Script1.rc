@@ -30,8 +30,11 @@ IDR_MENU1 MENU DISCARDABLE
 BEGIN
 
 
-	MENUITEM "Plus 1 agent",				ID_PLUS_AGENT
-	MENUITEM "Moins 1 agent",				ID_MOINS_AGENT 
+	MENUITEM "+1 agent",				ID_PLUS_AGENT
+	MENUITEM "-1 agent",				ID_MOINS_AGENT 
+
+	MENUITEM "+ distance",				ID_PLUS_OFFSET
+	MENUITEM "- distance",				ID_MOINS_OFFSET 
 
     POPUP "Leader"
     BEGIN
@@ -48,7 +51,16 @@ BEGIN
     BEGIN
         MENUITEM "Keys",                        ID_VIEW_KEYS
         MENUITEM "FPS",                         ID_VIEW_FPS
-		MENUITEM "Obstacles On/Off",			ID_OB_OBSTACLES
+    END
+	POPUP "Actions"
+    BEGIN
+        MENUITEM "Pause (p)"					IDR_P_KEY
+        MENUITEM "Wander on/off (w)"	        IDR_W_KEY
+        MENUITEM "Obstacles on/off (x)"	        IDR_X_KEY
+        MENUITEM "Walls on/off (c)"				IDR_C_KEY
+        MENUITEM "New path/Follow path on (u)"	IDR_U_KEY
+        MENUITEM "Follow path off (i)"			IDR_I_KEY
+        MENUITEM "Turn left/right (q/d)"	    IDR_QD_KEY
     END
     /*POPUP "Smoothing"
     BEGIN

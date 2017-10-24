@@ -6,7 +6,6 @@
 #define ID_AID_WANDER                   40001
 #define ID_AID_STEERINGFORCE            40002
 #define ID_AID_WALLFEELERS              40003
-#define ID_PLUS_AGENT                   40004
 #define ID_OB_OBSTACLES                 40005
 #define ID_OB_PATH                      40006
 #define ID_AID_DETECTIONBOX             40007
@@ -19,9 +18,21 @@
 #define ID_MENU_SMOOTHING               40014
 #define IDR_TWO_LEADER				    40015
 
-//////////////////////////////////////////////
-
 #define ID_MOINS_AGENT                  40016
+#define ID_PLUS_AGENT                   40017
+
+#define IDR_P_KEY					    40018 // Pause
+#define IDR_W_KEY					    40019 // Wander on/off
+#define IDR_QD_KEY					    40020 // Manual turn left/right
+#define IDR_X_KEY					    40022 // Show obstacles
+#define IDR_C_KEY					    40023 // Show walls
+#define IDR_U_KEY					    40024 // New path
+#define IDR_I_KEY					    40025 // Follow path
+
+#define ID_MOINS_OFFSET					40026
+#define ID_PLUS_OFFSET					40027
+
+//////////////////////////////////////////////
 //////////////////////////////////////////////
 
 // Next default values for new objects

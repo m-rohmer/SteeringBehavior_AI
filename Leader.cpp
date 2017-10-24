@@ -27,7 +27,7 @@ void Leader::RenderLeader()
 
 	else
 	{
-		if (ordi_)
+		if (this->Steering()->isWanderOn())
 		{
 			gdi->RedPen();
 		}

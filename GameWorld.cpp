@@ -28,7 +28,7 @@ GameWorld::GameWorld(int cx, int cy):
             m_cyClient(cy),
             m_bPaused(false),
             m_vCrosshair(Vector2D(cxClient()/2.0, cxClient()/2.0)),
-            m_bShowWalls(false),
+            m_bShowWalls(true),
             m_bShowObstacles(false),
             m_bShowPath(false),
             m_bShowWanderCircle(false),
@@ -40,7 +40,8 @@ GameWorld::GameWorld(int cx, int cy):
             m_pPath(NULL),
             m_bRenderNeighbors(false),
             m_bViewKeys(false),
-            m_bShowCellSpaceInfo(false)
+            m_bShowCellSpaceInfo(false),
+			m_iOffsetDistance(30)
 {
 
   //setup the spatial subdivision class
@@ -125,10 +126,10 @@ GameWorld::GameWorld(int cx, int cy):
 
   // Poursuite du leader par les autres véhicules
   // offset de la poursuite : 
-  int offsetDistance = 30;
+
    for (int i=1; i<Prm.NumAgents; ++i)
   {
-		Vector2D offset = Vector2D(-offsetDistance,0);           // Pursuit offset 
+		Vector2D offset = Vector2D(-m_iOffsetDistance,0);           // Pursuit offset 
 		m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
 
 		// Eviter les murs
@@ -295,113 +296,147 @@ void GameWorld::SetCrosshair(POINTS p)
 }
 
 
+//------------------------- HandleKeyDown -----------------------------
+void GameWorld::HandleKeyDown(WPARAM wParam)
+{
+
+	switch(wParam)
+	{
+
+//		When pressed :
+		
+	case 'Q': // turn left
+		
+		m_Vehicles[0]->Steering()->SetManualDirection(left);
+		m_Vehicles[0]->Steering()->WanderOff();
+		m_Vehicles[0]->Steering()->FollowPathOff();
+		m_Vehicles[0]->Steering()->ManualOn();
+		break;
+
+	case 'D': // turn right
+		
+		m_Vehicles[0]->Steering()->SetManualDirection(right);
+		m_Vehicles[0]->Steering()->WanderOff();
+		m_Vehicles[0]->Steering()->FollowPathOff();
+		m_Vehicles[0]->Steering()->ManualOn();
+		break;
+
+	} // end Switch
+}
+
 //------------------------- HandleKeyPresses -----------------------------
 void GameWorld::HandleKeyPresses(WPARAM wParam)
 {
 
   switch(wParam)
   {
-  case 'U':
+
+    case 'P': // Pause
+      
+      TogglePause(); 
+	  break;
+	  
+	case 'W': // wander on/off
+		if (m_Vehicles[0]->Steering()->isWanderOn())
+		{
+			m_Vehicles[0]->Steering()->WanderOff();
+			m_Vehicles[0]->Steering()->ManualOn();
+		} else
+		{
+			m_Vehicles[0]->Steering()->WanderOn();
+			m_Vehicles[0]->Steering()->ManualOff();
+		}
+		break;
+	
+    case 'X': // show obstacles
+		
+		m_bShowObstacles = !m_bShowObstacles;
+
+		if (!m_bShowObstacles)
+		{
+			m_Obstacles.clear();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->ObstacleAvoidanceOff();
+			}
+		}
+		else
+		{
+			CreateObstacles();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->ObstacleAvoidanceOn();
+			}
+        }
+        break;
+	  
+	case 'C': // show walls
+		
+		m_bShowWalls = !m_bShowWalls; 
+		if (!m_bShowWalls)
+		{
+			m_Walls.clear();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->WallAvoidanceOff();
+			}
+		} else
+		{
+			CreateWalls();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->WallAvoidanceOn();
+			}
+		}
+		break;
+		
+  case 'U': //Follow path on / new path
     {
       delete m_pPath;
       double border = 60;
       m_pPath = new Path(RandInt(3, 7), border, border, cxClient()-border, cyClient()-border, true); 
       m_bShowPath = true; 
-      for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-      {
-        m_Vehicles[i]->Steering()->SetPath(m_pPath->GetPath());
-      }
+      m_Vehicles[0]->Steering()->SetPath(m_pPath->GetPath());
+	  m_Vehicles[0]->Steering()->WanderOff();
+		m_Vehicles[0]->Steering()->ManualOff();
+	  m_Vehicles[0]->Steering()->FollowPathOn();
+	  if (!Prm.OneLeader)
+	  {
+		  m_Vehicles[m_Vehicles.size()-1]->Steering()->SetPath(m_pPath->GetPath());
+	  }
+      
     }
     break;
 
-    case 'P':
-      
-      TogglePause(); break;
-
-    case 'O':
-
-      ToggleRenderNeighbors(); break;
-
-    case 'I':
-
-      {
-        for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-        {
-          m_Vehicles[i]->ToggleSmoothing();
-        }
-
-      }
-
-      break;
-
-    case 'Y':
-
-       m_bShowObstacles = !m_bShowObstacles;
-
-        if (!m_bShowObstacles)
-        {
-          m_Obstacles.clear();
-
-          for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-          {
-            m_Vehicles[i]->Steering()->ObstacleAvoidanceOff();
-          }
-        }
-        else
-        {
-          CreateObstacles();
-
-          for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-          {
-            m_Vehicles[i]->Steering()->ObstacleAvoidanceOn();
-          }
-        }
-        break;
+	case 'I': // Follow path off
 		
-	case 'W':
-		if (m_Vehicles[0]->Steering()->isWanderOn())
-		{
-			m_Vehicles[0]->Steering()->WanderOff();
-		} else
-		{
-			m_Vehicles[0]->Steering()->WanderOn();
-		}
+		m_bShowPath = false; 
+		m_Vehicles[0]->Steering()->FollowPathOff();
+		m_Vehicles[0]->Steering()->WanderOn();
+		m_Vehicles[0]->Steering()->ManualOff();
 		break;
 		
-	case 'Z':
-		m_Vehicles[0]->SetMaxSpeed(1000);
-		if (m_Vehicles[0]->Velocity().Length()<m_Vehicles[0]->MaxSpeed())
-		{
-			//Incrément de vitesse : 
-			int i = 10;
-			Vector2D newSpeed = m_Vehicles[0]->Velocity();
-			double l = newSpeed.Length();
-			newSpeed.x = newSpeed.x*(l+i)/l;
-			newSpeed.y = newSpeed.y*(l+i)/l;
-			m_Vehicles[0]->SetVelocity(newSpeed);
-		}
-		break;
-		
-	case 'S':
-		if (m_Vehicles[0]->Velocity().Length()>0)
-		{
-			//Incrément de vitesse : 
-			int i = -10;
-			Vector2D newSpeed = m_Vehicles[0]->Velocity();
-			double l = newSpeed.Length();
-			newSpeed.x = max(newSpeed.x*(l+i)/l, 0);
-			newSpeed.y = max(newSpeed.y*(l+i)/l, 0);
-			m_Vehicles[0]->SetVelocity(newSpeed);
-		}
+		// When Q and D are released 
+
+	case 'Q': // turn left
+
+		m_Vehicles[0]->Steering()->SetManualDirection(front);
+		m_Vehicles[0]->Steering()->ManualOn();
 		break;
 
-	case 'Q':
-		if (m_Vehicles[0]->Steering()->isWanderOn())
-		{
-			m_Vehicles[0]->Steering()->WanderOff();
-		}
-		m_Vehicles[0]->SetHeading(Vector2D(cos(pi/4), sin(pi/4)));
+	case 'D': // turn right
+		
+		m_Vehicles[0]->Steering()->SetManualDirection(front);
+		m_Vehicles[0]->Steering()->ManualOn();
 		break;
+
+
+//		|
+//		|		x
+// -----|--------->
+//		|
+//		| y
+//		v 
 
   }//end switch
 }
@@ -413,89 +448,133 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 {
   switch(wParam)
   {
-    case ID_OB_OBSTACLES:
+	  /* Actions Menu
+	  IDR_W_KEY wander
+	  IDR_X_KEY obstacles
+	  IDR_C_KEY walls
+	  IDR_P_KEY pause
+	  IDR_I_KEY path off
+	  IDR_U_KEY path on
+	  IDR_QD_KEY turn
+	  */
+	
+	case IDR_P_KEY: //Pause
+		TogglePause(); 
+		break;
+	  
+	case IDR_W_KEY: // wander on/off
+		if (m_Vehicles[0]->Steering()->isWanderOn())
+		{
+			m_Vehicles[0]->Steering()->WanderOff();
+		} else
+		{
+			m_Vehicles[0]->Steering()->WanderOn();
+		}
+		break;
 
-        m_bShowObstacles = !m_bShowObstacles;
+    case IDR_X_KEY: // obstacles
 
-        if (!m_bShowObstacles)
-        {
-          m_Obstacles.clear();
+		m_bShowObstacles = !m_bShowObstacles;
+		if (!m_bShowObstacles)
+		{
+			m_Obstacles.clear();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->ObstacleAvoidanceOff();
+			}
+		}
+		else
+		{
+			CreateObstacles();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->ObstacleAvoidanceOn();
+			}
+		}
+		break;
+	   
+	case IDR_C_KEY: // show walls
+		
+		m_bShowWalls = !m_bShowWalls; 
+		if (!m_bShowWalls)
+		{
+			m_Walls.clear();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->WallAvoidanceOff();
+			}
+		} else
+		{
+			CreateWalls();
+			for (unsigned int i=0; i<m_Vehicles.size(); ++i)
+			{
+				m_Vehicles[i]->Steering()->WallAvoidanceOn();
+			}
+		}
+		break;
 
-          for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-          {
-            m_Vehicles[i]->Steering()->ObstacleAvoidanceOff();
-          }
+	case IDR_U_KEY: //Follow path on / new path
+    {
+      delete m_pPath;
+      double border = 60;
+      m_pPath = new Path(RandInt(3, 7), border, border, cxClient()-border, cyClient()-border, true); 
+      m_bShowPath = true; 
+      m_Vehicles[0]->Steering()->SetPath(m_pPath->GetPath());
+	  m_Vehicles[0]->Steering()->WanderOff();
+	  m_Vehicles[0]->Steering()->FollowPathOn();
+	  if (!Prm.OneLeader)
+	  {
+		  m_Vehicles[m_Vehicles.size()-1]->Steering()->SetPath(m_pPath->GetPath());
+	  }
+      
+    }
+    break;
 
-          //uncheck the menu
-         ChangeMenuState(hwnd, ID_OB_OBSTACLES, MFS_UNCHECKED);
-        }
-        else
-        {
-          CreateObstacles();
+	case IDR_I_KEY: // Follow path off
+		
+      m_bShowPath = false; 
+	  m_Vehicles[0]->Steering()->FollowPathOff();
+	  m_Vehicles[0]->Steering()->WanderOn();
+	  break;
 
-          for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-          {
-            m_Vehicles[i]->Steering()->ObstacleAvoidanceOn();
-          }
 
-          //check the menu
-          ChangeMenuState(hwnd, ID_OB_OBSTACLES, MFS_CHECKED);
-        }
+//------------------------ end Actions ------------------------------------------
 
-       break;
+	  
+	case ID_PLUS_OFFSET:
+	{
+		int last = Prm.NumAgents;
+		if (!Prm.OneLeader) last--; // On ne prend pas en compte le dernier vehicle si c'est le deuxieme leader
 
-    /*case IDR_ONE_LEADER:
-      {
-        for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-        {
-          m_Vehicles[i]->Steering()->ToggleSpacePartitioningOnOff();
-        }
+		m_iOffsetDistance+=5;
 
-        //if toggled on, empty the cell space and then re-add all the 
-        //vehicles
-        if (m_Vehicles[0]->Steering()->isSpacePartitioningOn())
-        {
-          m_pCellSpace->EmptyCells();
-       
-          for (unsigned int i=0; i<m_Vehicles.size(); ++i)
-          {
-            m_pCellSpace->AddEntity(m_Vehicles[i]);
-          }
+		for (int i=1; i<last; i++)
+		{
+			Vector2D offset = Vector2D(-m_iOffsetDistance,0);           // Pursuit offset 
+			m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
+		}
+			
+	}
+	break;
 
-          ChangeMenuState(hwnd, IDR_PARTITIONING, MFS_CHECKED);
-        }
-        else
-        {
-          ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_UNCHECKED);
-          ChangeMenuState(hwnd, IDR_TWO_LEADER, MFS_UNCHECKED);
-          m_bShowCellSpaceInfo = false;
+	case ID_MOINS_OFFSET:
+	{
+		if (m_iOffsetDistance > 5)
+		{
+			
+			int last = Prm.NumAgents;
+			if (!Prm.OneLeader) last--; // On ne prend pas en compte le dernier vehicle si c'est le deuxieme leader
 
-  
-      }
+			m_iOffsetDistance-=5;
 
-      break;*/
-
-    /*case IDR_TWO_LEADER:
-      {
-        m_bShowCellSpaceInfo = !m_bShowCellSpaceInfo;
-        
-        if (m_bShowCellSpaceInfo)
-        {
-          ChangeMenuState(hwnd, IDM_PARTITION_VIEW_NEIGHBORS, MFS_CHECKED);
-
-          if (!m_Vehicles[0]->Steering()->isSpacePartitioningOn())
-          {
-            SendMessage(hwnd, WM_COMMAND, IDR_ONE_LEADER, NULL);
-          }
-        }
-        else
-        {
-          ChangeMenuState(hwnd, IDM_PARTITION_VIEW_NEIGHBORS, MFS_UNCHECKED);
-        }
-      }
-      break;*/
-        
-
+			for (int i=1; i<last; i++)
+			{
+				Vector2D offset = Vector2D(-m_iOffsetDistance,0);           // Pursuit offset 
+				m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
+			}
+		}
+		break;
+	}
     case IDR_WEIGHTED_SUM:
       {
         ChangeMenuState(hwnd, IDR_WEIGHTED_SUM, MFS_CHECKED);
@@ -570,7 +649,9 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
       break;
       
   }//end switch
+
 }
+
 
 
 //------------------------------ Render ----------------------------------
