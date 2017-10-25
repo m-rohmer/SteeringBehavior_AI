@@ -34,6 +34,10 @@ Note : Dans le sous-menu "Actions", la fonction "Turn left/right" ne peut être c
 
 ------------------
 
-Le deuxième leader n'a pas d'intéraction avec les agents suiveurs, mais si on l'implémentait, les suiveurs localiseraient au lancement du monde le leader
+3) Le deuxième leader n'a pas d'intéraction avec les agents suiveurs, mais si on l'implémentait, les suiveurs localiseraient au lancement du monde le leader
 le plus proche et le suivrait jusqu'à trouver un agent plus proche, formant ainsi deux lignes derrière les deux leader qui s'entremêlent lorsque
 ces deux files se croisent.
+
+4) Avec un agent humain, les agents suiveurs continuent à suivre convenablement le leader
+
+
