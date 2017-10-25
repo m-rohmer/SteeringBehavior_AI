@@ -43,7 +43,6 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
     switch (msg)
     {
 
-
 		//A WM_CREATE msg is sent when your application window is first
 		//created
     case WM_CREATE:
@@ -135,6 +134,15 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 			ChangeMenuState(hwnd, IDR_ONE_LEADER, MFS_UNCHECKED);
 			break;
 		}
+
+		case IDR_F_KEY:
+		{
+			Prm.FlockingMode = !Prm.FlockingMode;
+			delete g_GameWorld;
+			g_GameWorld = new GameWorld(cxClient, cyClient);
+			break;
+		}
+
 		}// end switch
 	} // end case wp_command
     break;
@@ -167,12 +175,19 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
           case 'R':
             {
                delete g_GameWorld;
-           
                g_GameWorld = new GameWorld(cxClient, cyClient);
             }
+			break;
+			
+		  case 'F': // Flocking On/Off
+			{
+				Prm.FlockingMode = !Prm.FlockingMode;
+				delete g_GameWorld;
+				g_GameWorld = new GameWorld(cxClient, cyClient);
+			}
+			  
+			  break;
 
-            break;
-           
 
         }//end switch
 

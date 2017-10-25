@@ -28,9 +28,10 @@
 #define IDR_C_KEY					    40023 // Show walls
 #define IDR_U_KEY					    40024 // New path
 #define IDR_I_KEY					    40025 // Follow path
+#define IDR_F_KEY					    40026 // Flocking
 
-#define ID_MOINS_OFFSET					40026
-#define ID_PLUS_OFFSET					40027
+#define ID_MOINS_OFFSET					40027
+#define ID_PLUS_OFFSET					40028
 
 //////////////////////////////////////////////
 //////////////////////////////////////////////

@@ -92,7 +92,6 @@ GameWorld::GameWorld(int cx, int cy):
                                     Prm.MaxTurnRatePerSecond, //max turn rate
                                     Prm.VehicleScale);        //scale
 
-	    //pVehicle->Steering()->FlockingOn();
 		m_Vehicles.push_back(pVehicle);
 		//add it to the cell subdivision
 		m_pCellSpace->AddEntity(pVehicle);
@@ -127,18 +126,59 @@ GameWorld::GameWorld(int cx, int cy):
   // Poursuite du leader par les autres véhicules
   // offset de la poursuite : 
 
-   for (int i=1; i<Prm.NumAgents; ++i)
+  if (!Prm.FlockingMode)
   {
-		Vector2D offset = Vector2D(-m_iOffsetDistance,0);           // Pursuit offset 
-		m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
+	  for (int i=1; i<Prm.NumAgents; ++i)
+	  {
+			Vector2D offset = Vector2D(-m_iOffsetDistance,0);           // Pursuit offset 
+			m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
 
-		// Eviter les murs
-		m_Vehicles[i]->Steering()->WallAvoidanceOn();
+			// Eviter les murs
+			m_Vehicles[i]->Steering()->WallAvoidanceOn();
+			// Eviter les obstacles
+			m_Vehicles[i]->Steering()->ObstacleAvoidanceOn();
 
-		// Une ligne bien structurée
-		m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+			// Une ligne bien structurée
+			m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+	  }
+  } 
+  else // if flocking on
+  {
+	  for (int i=1; i<Prm.NumAgents/2+1; ++i)
+	  {
+			Vector2D offset = Vector2D(-m_iOffsetDistance/2,-m_iOffsetDistance/2);           // Pursuit offset 
+			m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
 
+			// Eviter les murs
+			m_Vehicles[i]->Steering()->WallAvoidanceOn();
+			// Eviter les obstacles
+			m_Vehicles[i]->Steering()->ObstacleAvoidanceOn();
+
+			// Une ligne bien structurée
+			m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+	  }
+
+	  for (int i=Prm.NumAgents/2+1; i<Prm.NumAgents; ++i)
+	  {
+			Vector2D offset = Vector2D(-m_iOffsetDistance/2,m_iOffsetDistance/2);           // Pursuit offset 
+			if (i==Prm.NumAgents/2+1)
+			{
+				m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[0], offset);
+			} else
+			{
+				m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i-1], offset);
+			}
+			// Eviter les murs
+			m_Vehicles[i]->Steering()->WallAvoidanceOn();
+			// Eviter les obstacles
+			m_Vehicles[i]->Steering()->ObstacleAvoidanceOn();
+
+			// Une ligne bien structurée
+			m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+	  }
   }
+
+
 #endif
  
   //create any obstacles or walls
@@ -415,9 +455,9 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		m_Vehicles[0]->Steering()->WanderOn();
 		m_Vehicles[0]->Steering()->ManualOff();
 		break;
-		
-		// When Q and D are released 
 
+		
+	// When Q and D are released 
 	case 'Q': // turn left
 
 		m_Vehicles[0]->Steering()->SetManualDirection(front);

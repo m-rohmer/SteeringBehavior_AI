@@ -72,7 +72,6 @@ private:
   double                         m_dAvFrameTime;
 
   // Offset distance between agents
-  
   int							m_iOffsetDistance;
 
 
@@ -156,6 +155,7 @@ public:
   
   void  ToggleViewKeys(){m_bViewKeys = !m_bViewKeys;}
   bool  ViewKeys()const{return m_bViewKeys;}
+
 
 };
 

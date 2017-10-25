@@ -75,6 +75,7 @@ private:
 
     MaxTurnRatePerSecond    = Pi;
 	OneLeader = true;
+	FlockingMode = false;
   }
 
 public:
@@ -84,6 +85,7 @@ public:
   int	NumAgents;
   int	NumObstacles;
   bool OneLeader;
+  bool FlockingMode;
   double MinObstacleRadius;
   double MaxObstacleRadius;
 

@@ -41,12 +41,6 @@ BEGIN
         MENUITEM "Un leader",                   IDR_ONE_LEADER
         MENUITEM "Deux leader",					IDR_TWO_LEADER
     END
-    /*POPUP "Calculate Method"
-    BEGIN
-        MENUITEM "Weighted Sum",                IDR_WEIGHTED_SUM
-        MENUITEM "Prioritized",                 IDR_PRIORITIZED
-        MENUITEM "Dithered",                    IDR_DITHERED
-    END*/
     POPUP "Info"
     BEGIN
         MENUITEM "Keys",                        ID_VIEW_KEYS
@@ -55,17 +49,15 @@ BEGIN
 	POPUP "Actions"
     BEGIN
         MENUITEM "Pause (p)"					IDR_P_KEY
-        MENUITEM "Wander on/off (w)"	        IDR_W_KEY
-        MENUITEM "Obstacles on/off (x)"	        IDR_X_KEY
-        MENUITEM "Walls on/off (c)"				IDR_C_KEY
-        MENUITEM "New path/Follow path on (u)"	IDR_U_KEY
-        MENUITEM "Follow path off (i)"			IDR_I_KEY
+        MENUITEM "Manual mode On/Off (w)"	    IDR_W_KEY
+        MENUITEM "Flocking On/Off (f)"			IDR_F_KEY
+        MENUITEM "Obstacles On/Off (x)"	        IDR_X_KEY
+        MENUITEM "Walls On/Off (c)"				IDR_C_KEY
+        MENUITEM "New path/Follow path (u)"		IDR_U_KEY
+        MENUITEM "Follow path Off (i)"			IDR_I_KEY
         MENUITEM "Turn left/right (q/d)"	    IDR_QD_KEY
     END
-    /*POPUP "Smoothing"
-    BEGIN
-        MENUITEM "On/Off",                      ID_MENU_SMOOTHING
-    END*/
+
 END
 
 
